@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SiAntrean — Kelurahan Digital</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f3ee;
+    --bg2: #eceae3;
+    --surface: #ffffff;
+    --surface2: #faf9f6;
+    --border: #dedad2;
+    --text: #1a1916;
+    --text2: #6b6860;
+    --text3: #9e9b94;
+    --accent: #2d5a3d;
+    --accent2: #4a8c61;
+    --accent-light: #e8f2eb;
+    --danger: #c0392b;
+    --danger-light: #fdecea;
+    --warn: #d68910;
+    --warn-light: #fef9ec;
+    --info: #1a6fa0;
+    --info-light: #e8f4fb;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 16px rgba(0,0,0,0.07);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ── SCREENS ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── LOGIN ── */
+  #screen-login { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #2d5a3d 0%, #1e3d2a 60%, #0f2218 100%); padding: 24px; }
+  .login-card { background: var(--surface); border-radius: 24px; padding: 48px 44px; width: 100%; max-width: 460px; box-shadow: var(--shadow-lg); }
+  .login-logo { display: flex; align-items: center; gap: 14px; margin-bottom: 36px; }
+  .login-logo-icon { width: 52px; height: 52px; background: var(--accent); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+  .login-logo-text h1 { font-family: 'Instrument Serif', serif; font-size: 22px; color: var(--text); line-height: 1.2; }
+  .login-logo-text p { font-size: 12px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+  .tab-toggle { display: flex; background: var(--bg2); border-radius: var(--radius-sm); padding: 4px; margin-bottom: 28px; }
+  .tab-btn { flex: 1; padding: 9px; border: none; background: transparent; border-radius: 6px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; color: var(--text2); transition: all 0.2s; }
+  .tab-btn.active { background: var(--surface); color: var(--accent); box-shadow: 0 1px 6px rgba(0,0,0,0.1); }
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 7px; }
+  .form-group input { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-family: inherit; background: var(--surface2); color: var(--text); outline: none; transition: border-color 0.2s; }
+  .form-group input:focus { border-color: var(--accent); background: #fff; }
+  .btn-primary { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.2s, transform 0.1s; margin-top: 6px; }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-primary:active { transform: scale(0.98); }
+  .login-hint { font-size: 12px; color: var(--text3); margin-top: 18px; text-align: center; line-height: 1.6; background: var(--bg2); border-radius: var(--radius-sm); padding: 10px 14px; }
+  .error-msg { background: var(--danger-light); color: var(--danger); font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); margin-bottom: 14px; font-weight: 500; display: none; }
+
+  /* ── LAYOUT ── */
+  #screen-app { display: none; flex-direction: column; min-height: 100vh; }
+  #screen-app.active { display: flex; }
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 28px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .topbar-brand { display: flex; align-items: center; gap: 10px; }
+  .topbar-brand-icon { width: 34px; height: 34px; background: var(--accent); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .topbar-brand h2 { font-family: 'Instrument Serif', serif; font-size: 18px; color: var(--text); }
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+  .topbar-user { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text2); }
+  .topbar-avatar { width: 32px; height: 32px; background: var(--accent-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--accent); font-weight: 800; }
+  .btn-logout { padding: 7px 14px; background: transparent; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; font-weight: 700; font-family: inherit; cursor: pointer; color: var(--text2); transition: all 0.15s; }
+  .btn-logout:hover { border-color: var(--danger); color: var(--danger); }
+  .nav-tabs { display: flex; gap: 4px; padding: 0 28px; background: var(--surface); border-bottom: 1px solid var(--border); overflow-x: auto; }
+  .nav-tab { padding: 14px 18px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; background: transparent; font-family: inherit; color: var(--text3); border-bottom: 2.5px solid transparent; white-space: nowrap; transition: color 0.2s, border-color 0.2s; }
+  .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .nav-tab:hover:not(.active) { color: var(--text); }
+  .main-content { flex: 1; padding: 28px; max-width: 1100px; width: 100%; margin: 0 auto; }
+
+  /* ── PAGES ── */
+  .page { display: none; }
+  .page.active { display: block; }
+  .page-header { margin-bottom: 28px; }
+  .page-header h2 { font-family: 'Instrument Serif', serif; font-size: 26px; color: var(--text); margin-bottom: 4px; }
+  .page-header p { font-size: 14px; color: var(--text2); }
+
+  /* ── CARDS ── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
+  .card + .card { margin-top: 16px; }
+  .card-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text3); margin-bottom: 14px; }
+
+  /* ── LOKET GRID ── */
+  .loket-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .loket-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 22px; position: relative; overflow: hidden; }
+  .loket-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--accent); }
+  .loket-num { font-family: 'Instrument Serif', serif; font-size: 40px; color: var(--accent); line-height: 1; }
+  .loket-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 18px; }
+  .loket-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .loket-stat { background: var(--bg2); border-radius: var(--radius-sm); padding: 10px 12px; }
+  .loket-stat-num { font-size: 22px; font-weight: 800; color: var(--text); }
+  .loket-stat-label { font-size: 11px; color: var(--text3); font-weight: 500; margin-top: 1px; }
+  .loket-current { display: flex; align-items: center; gap: 8px; margin-top: 14px; padding: 10px 12px; background: var(--accent-light); border-radius: var(--radius-sm); }
+  .loket-current-num { font-size: 22px; font-weight: 800; color: var(--accent); font-family: 'Instrument Serif', serif; }
+  .loket-current-label { font-size: 11px; color: var(--accent2); font-weight: 600; }
+  .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; gap: 4px; }
+  .badge-success { background: var(--accent-light); color: var(--accent); }
+  .badge-warn { background: var(--warn-light); color: var(--warn); }
+  .badge-danger { background: var(--danger-light); color: var(--danger); }
+  .badge-info { background: var(--info-light); color: var(--info); }
+  .badge-grey { background: var(--bg2); color: var(--text3); }
+
+  /* ── BOOKING FORM ── */
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group select { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-family: inherit; background: var(--surface2); color: var(--text); outline: none; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6860' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; transition: border-color 0.2s; }
+  .form-group select:focus { border-color: var(--accent); }
+  .form-group textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-family: inherit; background: var(--surface2); color: var(--text); outline: none; resize: vertical; min-height: 80px; transition: border-color 0.2s; }
+  .form-group textarea:focus { border-color: var(--accent); }
+  .btn-secondary { padding: 12px 22px; background: transparent; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; color: var(--text2); transition: all 0.15s; }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-accent { padding: 12px 22px; background: var(--accent); border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; color: white; transition: background 0.15s, transform 0.1s; }
+  .btn-accent:hover { background: var(--accent2); }
+  .btn-accent:active { transform: scale(0.97); }
+  .booking-estimate { background: var(--accent-light); border: 1px solid #b8ddc4; border-radius: var(--radius-sm); padding: 14px 16px; margin-top: 14px; display: none; }
+  .booking-estimate strong { color: var(--accent); font-size: 15px; }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); border-bottom: 1.5px solid var(--border); background: var(--surface2); }
+  td { padding: 12px 14px; border-bottom: 1px solid var(--bg2); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+  .action-btns { display: flex; gap: 8px; }
+  .btn-sm { padding: 5px 12px; font-size: 12px; font-weight: 700; font-family: inherit; border-radius: 6px; cursor: pointer; border: none; transition: opacity 0.15s; }
+  .btn-approve { background: var(--accent-light); color: var(--accent); }
+  .btn-approve:hover { background: #c8e6d0; }
+  .btn-reject { background: var(--danger-light); color: var(--danger); }
+  .btn-reject:hover { background: #f5c6c2; }
+  .btn-done { background: var(--info-light); color: var(--info); }
+  .btn-done:hover { background: #c0dff0; }
+
+  /* ── NOTIF ── */
+  .notif-banner { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: white; padding: 14px 20px; border-radius: var(--radius); font-size: 13px; font-weight: 600; box-shadow: var(--shadow-lg); z-index: 9999; max-width: 320px; display: none; animation: slideUp 0.3s ease; }
+  .notif-banner.show { display: flex; align-items: center; gap: 10px; }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .notif-icon { font-size: 20px; }
+  .notif-list { display: flex; flex-direction: column; gap: 10px; }
+  .notif-item { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; position: relative; }
+  .notif-item.unread { border-color: var(--accent); background: var(--accent-light); }
+  .notif-item-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .notif-item-body { font-size: 13px; color: var(--text2); line-height: 1.5; }
+  .notif-item-time { font-size: 11px; color: var(--text3); margin-top: 6px; font-weight: 500; }
+  .notif-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; position: absolute; top: 16px; right: 16px; }
+
+  /* ── QUEUE LIST ── */
+  .queue-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); margin-bottom: 8px; transition: border-color 0.2s; }
+  .queue-item:hover { border-color: var(--accent); }
+  .queue-num { font-family: 'Instrument Serif', serif; font-size: 28px; color: var(--accent); width: 52px; text-align: center; font-weight: 400; }
+  .queue-info { flex: 1; }
+  .queue-name { font-size: 14px; font-weight: 700; color: var(--text); }
+  .queue-meta { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .queue-time { font-size: 12px; color: var(--text3); font-weight: 500; text-align: right; }
+  .empty-state { text-align: center; padding: 48px 20px; color: var(--text3); }
+  .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; }
+
+  /* ── STATS HOME ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+  .stat-val { font-size: 32px; font-weight: 800; color: var(--text); font-family: 'Instrument Serif', serif; line-height: 1; }
+  .stat-label { font-size: 12px; color: var(--text3); font-weight: 600; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .stat-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+  /* ── TICKET ── */
+  .ticket-card { background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%); color: white; border-radius: var(--radius); padding: 26px; position: relative; overflow: hidden; }
+  .ticket-card::after { content: ''; position: absolute; right: -30px; top: -30px; width: 140px; height: 140px; border: 30px solid rgba(255,255,255,0.08); border-radius: 50%; }
+  .ticket-num { font-family: 'Instrument Serif', serif; font-size: 56px; font-weight: 400; line-height: 1; }
+  .ticket-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.8; margin-bottom: 6px; }
+  .ticket-detail { font-size: 13px; opacity: 0.9; margin-top: 14px; line-height: 1.8; }
+
+  /* ── MODAL ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; display: none; align-items: center; justify-content: center; padding: 24px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border-radius: var(--radius); padding: 32px; max-width: 480px; width: 100%; box-shadow: var(--shadow-lg); }
+  .modal h3 { font-family: 'Instrument Serif', serif; font-size: 22px; margin-bottom: 12px; }
+  .modal p { font-size: 14px; color: var(--text2); margin-bottom: 20px; line-height: 1.6; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .main-content { padding: 16px; }
+    .form-row { grid-template-columns: 1fr; }
+    .loket-grid { grid-template-columns: 1fr; }
+    .login-card { padding: 32px 24px; }
+    .topbar { padding: 0 16px; }
+    .nav-tabs { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     SCREEN: LOGIN
+══════════════════════════════════════════════ -->
+<div id="screen-login" class="screen active">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">🏛️</div>
+      <div class="login-logo-text">
+        <h1>SiAntrean</h1>
+        <p>Kelurahan Digital</p>
+      </div>
+    </div>
+
+    <div class="tab-toggle">
+      <button class="tab-btn active" onclick="switchLoginTab('warga')">Warga Sipil</button>
+      <button class="tab-btn" onclick="switchLoginTab('admin')">Admin Kelurahan</button>
+    </div>
+
+    <div id="error-login" class="error-msg"></div>
+
+    <!-- Warga Form -->
+    <div id="form-warga">
+      <div class="form-group">
+        <label>Nomor KTP</label>
+        <input type="text" id="login-ktp" placeholder="Masukkan nomor KTP" maxlength="20">
+      </div>
+      <div class="form-group">
+        <label>Nama Lengkap</label>
+        <input type="text" id="login-nama" placeholder="Sesuai KTP">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tempat Lahir</label>
+          <input type="text" id="login-tempat" placeholder="Kota lahir">
+        </div>
+        <div class="form-group">
+          <label>Tanggal Lahir</label>
+          <input type="date" id="login-tgl">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="login-email-warga" placeholder="Email Anda">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-pass-warga" placeholder="Password">
+      </div>
+      <button class="btn-primary" onclick="loginWarga()">Masuk sebagai Warga</button>
+      <div class="login-hint">🔑 Demo: KTP <strong>12345</strong> | Nama <strong>Warga Sipil 1</strong> | Lahir Semarang, 01/01/2000 | Email wargasipil@gmail.com | Password <strong>890</strong></div>
+    </div>
+
+    <!-- Admin Form -->
+    <div id="form-admin" style="display:none">
+      <div class="form-group">
+        <label>Email Admin</label>
+        <input type="email" id="login-email-admin" placeholder="Email kelurahan">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-pass-admin" placeholder="Password">
+      </div>
+      <button class="btn-primary" onclick="loginAdmin()">Masuk sebagai Admin</button>
+      <div class="login-hint">🔑 Demo: Email <strong>admin01@gmail.com</strong> | Password <strong>890</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SCREEN: APP
+══════════════════════════════════════════════ -->
+<div id="screen-app" class="screen">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-brand-icon">🏛️</div>
+      <h2>SiAntrean</h2>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-user">
+        <div class="topbar-avatar" id="top-avatar">W</div>
+        <span id="top-name">Warga</span>
+      </div>
+      <button class="btn-logout" onclick="logout()">Keluar</button>
+    </div>
+  </div>
+
+  <div class="nav-tabs" id="nav-tabs">
+    <!-- filled by JS -->
+  </div>
+
+  <div class="main-content">
+
+    <!-- ── PAGE: BERANDA ── -->
+    <div class="page" id="page-beranda">
+      <div class="page-header">
+        <h2>Selamat datang! 👋</h2>
+        <p id="beranda-sub">Kelola antrean dan booking layanan kelurahan Anda di sini.</p>
+      </div>
+
+      <div class="stats-grid" id="beranda-stats"></div>
+
+      <div class="loket-grid" id="loket-overview"></div>
+
+      <div id="my-ticket-section" style="display:none">
+        <h3 style="font-family:'Instrument Serif',serif;font-size:18px;margin-bottom:14px;">Tiket Antrean Aktif Anda</h3>
+        <div id="my-ticket-content"></div>
+      </div>
+    </div>
+
+    <!-- ── PAGE: BOOKING ONLINE ── -->
+    <div class="page" id="page-booking">
+      <div class="page-header">
+        <h2>Booking Online</h2>
+        <p>Buat jadwal kedatangan Anda, tidak perlu antre lama di kantor.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Form Booking Layanan</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Pilih Loket</label>
+            <select id="book-loket" onchange="updateEstimate()">
+              <option value="">-- Pilih Loket --</option>
+              <option value="1">Loket 1 — Administrasi Kependudukan</option>
+              <option value="2">Loket 2 — Surat & Perizinan</option>
+              <option value="3">Loket 3 — Sosial & Layanan Umum</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Jenis Layanan</label>
+            <select id="book-layanan" onchange="updateEstimate()">
+              <option value="">-- Pilih Layanan --</option>
+              <option value="Surat Keterangan Domisili" data-dur="15">Surat Keterangan Domisili (±15 mnt)</option>
+              <option value="Surat Keterangan Tidak Mampu" data-dur="20">Surat Keterangan Tidak Mampu (±20 mnt)</option>
+              <option value="Surat Pengantar KTP" data-dur="10">Surat Pengantar KTP (±10 mnt)</option>
+              <option value="Surat Keterangan Usaha" data-dur="25">Surat Keterangan Usaha (±25 mnt)</option>
+              <option value="Kartu Keluarga" data-dur="30">Kartu Keluarga (±30 mnt)</option>
+              <option value="Surat Pindah" data-dur="25">Surat Pindah (±25 mnt)</option>
+              <option value="Legalisasi Dokumen" data-dur="10">Legalisasi Dokumen (±10 mnt)</option>
+              <option value="Surat Keterangan Kelahiran" data-dur="20">Surat Keterangan Kelahiran (±20 mnt)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tanggal Kunjungan</label>
+            <input type="date" id="book-tanggal" onchange="updateEstimate()">
+          </div>
+          <div class="form-group">
+            <label>Keperluan (Opsional)</label>
+            <input type="text" id="book-keperluan" placeholder="Jelaskan keperluan singkat">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Catatan Tambahan</label>
+          <textarea id="book-catatan" placeholder="Informasi pendukung lainnya…"></textarea>
+        </div>
+
+        <div class="booking-estimate" id="booking-estimate">
+          📋 Perkiraan: <strong id="est-text">—</strong>
+          <div style="font-size:12px;color:var(--accent2);margin-top:4px;" id="est-detail"></div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:20px;">
+          <button class="btn-accent" onclick="submitBooking()">📅 Ajukan Booking</button>
+          <button class="btn-secondary" onclick="resetBookingForm()">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PAGE: STATUS BOOKING ── -->
+    <div class="page" id="page-status">
+      <div class="page-header">
+        <h2>Status Booking Saya</h2>
+        <p>Pantau status pengajuan dan notifikasi selesainya surat Anda.</p>
+      </div>
+      <div id="status-list"></div>
+    </div>
+
+    <!-- ── PAGE: ANTREAN ── -->
+    <div class="page" id="page-antrean">
+      <div class="page-header">
+        <h2>Monitor Antrean</h2>
+        <p>Lihat kondisi antrean tiap loket secara real-time.</p>
+      </div>
+      <div class="loket-grid" id="loket-detail"></div>
+      <div id="waiting-lists"></div>
+    </div>
+
+    <!-- ── PAGE: NOTIFIKASI ── -->
+    <div class="page" id="page-notif">
+      <div class="page-header">
+        <h2>Notifikasi</h2>
+        <p>Riwayat pemberitahuan dari kelurahan untuk Anda.</p>
+      </div>
+      <div class="notif-list" id="notif-list"></div>
+    </div>
+
+    <!-- ── PAGE: ADMIN BOOKING ── -->
+    <div class="page" id="page-admin-booking">
+      <div class="page-header">
+        <h2>Persetujuan Booking</h2>
+        <p>Tinjau dan setujui / tolak pengajuan booking dari warga.</p>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table id="admin-booking-table">
+            <thead>
+              <tr>
+                <th>ID</th><th>Nama Warga</th><th>Loket</th><th>Layanan</th><th>Tanggal</th><th>Status</th><th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="admin-booking-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PAGE: ADMIN ANTREAN ── -->
+    <div class="page" id="page-admin-antrean">
+      <div class="page-header">
+        <h2>Manajemen Antrean</h2>
+        <p>Atur nomor antrean aktif dan panggil antrean berikutnya.</p>
+      </div>
+      <div class="loket-grid" id="admin-loket-grid"></div>
+    </div>
+
+    <!-- ── PAGE: ADMIN SELESAI ── -->
+    <div class="page" id="page-admin-selesai">
+      <div class="page-header">
+        <h2>Konfirmasi Surat Selesai</h2>
+        <p>Tandai surat yang sudah selesai diproses agar warga mendapat notifikasi.</p>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Nama Warga</th><th>Layanan</th><th>Tgl Booking</th><th>Status</th><th>Aksi</th></tr>
+            </thead>
+            <tbody id="admin-selesai-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PAGE: ADMIN MONITOR ── -->
+    <div class="page" id="page-admin-monitor">
+      <div class="page-header">
+        <h2>Monitor Semua Antrean</h2>
+        <p>Pantau kondisi loket dan antrean secara menyeluruh.</p>
+      </div>
+      <div class="stats-grid" id="admin-stats-grid"></div>
+      <div id="admin-all-queues"></div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /screen-app -->
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">Konfirmasi</h3>
+    <p id="modal-body">Apakah Anda yakin?</p>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Batal</button>
+      <button class="btn-accent" id="modal-confirm">Ya, Lanjutkan</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIF BANNER -->
+<div class="notif-banner" id="notif-banner">
+  <span class="notif-icon">🔔</span>
+  <span id="notif-banner-text"></span>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+const USERS = {
+  warga: [
+    { ktp:'12345', nama:'Warga Sipil 1', tempatLahir:'Semarang',
+      tglLahir:'2000-01-01', email:'wargasipil@gmail.com', password:'890', role:'warga' }
+  ],
+  admin: [
+    { email:'admin01@gmail.com', password:'890', nama:'Admin 01', role:'admin' }
+  ]
+};
+
+let state = {
+  currentUser: null,
+  lokets: [
+    { id:1, nama:'Loket 1', desc:'Administrasi Kependudukan', current: 'A-005', waiting: 8, done: 12, queue:[] },
+    { id:2, nama:'Loket 2', desc:'Surat & Perizinan', current: 'B-003', waiting: 5, done: 9, queue:[] },
+    { id:3, nama:'Loket 3', desc:'Sosial & Layanan Umum', current: 'C-007', waiting: 3, done: 7, queue:[] },
+  ],
+  bookings: [],
+  notifications: [],
+  bookingCounter: 100,
+  queueCounters: { 1: 5, 2: 3, 3: 7 },
+};
+
+// Pre-populate demo bookings
+state.bookings = [
+  { id:'BK-097', userId:'12345', userName:'Warga Sipil 1', loketId:1, layanan:'Surat Keterangan Domisili', tanggal:'2026-05-22', keperluan:'', catatan:'', status:'approved', nomorAntrean:'A-009', estimasiTiba:'09:30', estimasiSelesai:'09:45', suratSelesai:false, createdAt: new Date(Date.now()-3600000) },
+  { id:'BK-098', userId:'12345', userName:'Warga Sipil 1', loketId:2, layanan:'Surat Keterangan Usaha', tanggal:'2026-05-23', keperluan:'', catatan:'', status:'pending', nomorAntrean:null, estimasiTiba:null, estimasiSelesai:null, suratSelesai:false, createdAt: new Date(Date.now()-1800000) },
+];
+state.notifications = [
+  { id:'n1', title:'Booking Disetujui', body:'Booking BK-097 untuk Surat Keterangan Domisili telah disetujui. Nomor antrean Anda: A-009. Perkiraan tiba pukul 09:30.', time: new Date(Date.now()-3600000), read:false },
+];
+
+// Demo queue lists per loket
+const demoNames = ['Budi Santoso','Rina Dewi','Ahmad Fauzi','Siti Rahayu','Doni Prasetyo','Lina Hartati','Rizky Ramadhan','Maya Sari'];
+[1,2,3].forEach(id => {
+  const loket = state.lokets[id-1];
+  const prefix = ['A','B','C'][id-1];
+  const cnt = loket.waiting;
+  for(let i=1;i<=cnt;i++){
+    loket.queue.push({ num: `${prefix}-${String(loket.queueStart||i+5).padStart(3,'0')}`, name: demoNames[(i-1)%demoNames.length], layanan:'Umum', waktu: `0${8+i}:${i%2===0?'00':'30'}` });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════════════════
+let loginTab = 'warga';
+
+function switchLoginTab(tab) {
+  loginTab = tab;
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (i===0&&tab==='warga')||(i===1&&tab==='admin')));
+  document.getElementById('form-warga').style.display = tab==='warga'?'block':'none';
+  document.getElementById('form-admin').style.display = tab==='admin'?'block':'none';
+  document.getElementById('error-login').style.display = 'none';
+}
+
+function showLoginError(msg) {
+  const el = document.getElementById('error-login');
+  el.textContent = msg; el.style.display = 'block';
+}
+
+function loginWarga() {
+  const ktp = document.getElementById('login-ktp').value.trim();
+  const nama = document.getElementById('login-nama').value.trim().toLowerCase();
+  const tempat = document.getElementById('login-tempat').value.trim().toLowerCase();
+  const tgl = document.getElementById('login-tgl').value;
+  const email = document.getElementById('login-email-warga').value.trim().toLowerCase();
+  const pass = document.getElementById('login-pass-warga').value;
+
+  const user = USERS.warga.find(u =>
+    u.ktp === ktp &&
+    u.nama.toLowerCase() === nama &&
+    u.tempatLahir.toLowerCase() === tempat &&
+    u.tglLahir === tgl &&
+    u.email.toLowerCase() === email &&
+    u.password === pass
+  );
+  if (!user) { showLoginError('❌ Data tidak sesuai. Periksa kembali nomor KTP, nama, tempat/tanggal lahir, email, dan password.'); return; }
+  enterApp(user);
+}
+
+function loginAdmin() {
+  const email = document.getElementById('login-email-admin').value.trim().toLowerCase();
+  const pass = document.getElementById('login-pass-admin').value;
+  const user = USERS.admin.find(u => u.email.toLowerCase()===email && u.password===pass);
+  if (!user) { showLoginError('❌ Email atau password admin salah.'); return; }
+  enterApp(user);
+}
+
+function enterApp(user) {
+  state.currentUser = user;
+  document.getElementById('screen-login').classList.remove('active');
+  document.getElementById('screen-app').classList.add('active');
+  document.getElementById('top-name').textContent = user.nama;
+  document.getElementById('top-avatar').textContent = user.nama[0].toUpperCase();
+  buildNav();
+  navigateTo(user.role==='admin' ? 'admin-booking' : 'beranda');
+}
+
+function logout() {
+  state.currentUser = null;
+  document.getElementById('screen-app').classList.remove('active');
+  document.getElementById('screen-login').classList.add('active');
+  // clear inputs
+  ['login-ktp','login-nama','login-tempat','login-tgl','login-email-warga','login-pass-warga','login-email-admin','login-pass-admin'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+const WARGA_TABS = [
+  { id:'beranda', label:'🏠 Beranda' },
+  { id:'booking', label:'📅 Booking Online' },
+  { id:'status', label:'📋 Status Booking' },
+  { id:'antrean', label:'🔢 Antrean' },
+  { id:'notif', label:'🔔 Notifikasi' },
+];
+const ADMIN_TABS = [
+  { id:'admin-booking', label:'✅ Persetujuan Booking' },
+  { id:'admin-antrean', label:'🎫 Kelola Antrean' },
+  { id:'admin-selesai', label:'📜 Surat Selesai' },
+  { id:'admin-monitor', label:'📊 Monitor Loket' },
+];
+
+function buildNav() {
+  const tabs = state.currentUser.role==='admin' ? ADMIN_TABS : WARGA_TABS;
+  const nav = document.getElementById('nav-tabs');
+  nav.innerHTML = tabs.map(t => `<button class="nav-tab" id="nav-${t.id}" onclick="navigateTo('${t.id}')">${t.label}</button>`).join('');
+}
+
+function navigateTo(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  const page = document.getElementById('page-'+pageId);
+  if(page) page.classList.add('active');
+  const tab = document.getElementById('nav-'+pageId);
+  if(tab) tab.classList.add('active');
+  renderPage(pageId);
+}
+
+function renderPage(id) {
+  switch(id) {
+    case 'beranda': renderBeranda(); break;
+    case 'booking': renderBookingForm(); break;
+    case 'status': renderStatus(); break;
+    case 'antrean': renderAntrean(); break;
+    case 'notif': renderNotif(); break;
+    case 'admin-booking': renderAdminBooking(); break;
+    case 'admin-antrean': renderAdminAntrean(); break;
+    case 'admin-selesai': renderAdminSelesai(); break;
+    case 'admin-monitor': renderAdminMonitor(); break;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// BERANDA (WARGA)
+// ═══════════════════════════════════════════════════════════
+function renderBeranda() {
+  const u = state.currentUser;
+  document.getElementById('beranda-sub').textContent = `Halo, ${u.nama}! Kelola antrean dan booking layanan kelurahan Anda di sini.`;
+
+  const myBookings = state.bookings.filter(b => b.userId===u.ktp);
+  const pending = myBookings.filter(b=>b.status==='pending').length;
+  const approved = myBookings.filter(b=>b.status==='approved').length;
+  const unread = state.notifications.filter(n=>!n.read).length;
+  const totalWaiting = state.lokets.reduce((s,l)=>s+l.waiting,0);
+
+  document.getElementById('beranda-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-val">${myBookings.length}</div><div class="stat-label">Total Booking</div><div class="stat-sub">Semua pengajuan Anda</div></div>
+    <div class="stat-card"><div class="stat-val">${pending}</div><div class="stat-label">Menunggu Konfirmasi</div><div class="stat-sub">Perlu persetujuan admin</div></div>
+    <div class="stat-card"><div class="stat-val">${approved}</div><div class="stat-label">Disetujui</div><div class="stat-sub">Booking aktif</div></div>
+    <div class="stat-card"><div class="stat-val">${totalWaiting}</div><div class="stat-label">Total Antrian Hari Ini</div><div class="stat-sub">Semua loket</div></div>
+    <div class="stat-card"><div class="stat-val">${unread}</div><div class="stat-label">Notifikasi Baru</div><div class="stat-sub">Belum dibaca</div></div>
+  `;
+
+  document.getElementById('loket-overview').innerHTML = state.lokets.map(l => `
+    <div class="loket-card">
+      <div class="loket-num">${l.id}</div>
+      <div class="loket-label">${l.desc}</div>
+      <div class="loket-stats">
+        <div class="loket-stat"><div class="loket-stat-num">${l.waiting}</div><div class="loket-stat-label">Sedang Antri</div></div>
+        <div class="loket-stat"><div class="loket-stat-num">${l.done}</div><div class="loket-stat-label">Selesai Hari Ini</div></div>
+      </div>
+      <div class="loket-current">
+        <div>
+          <div class="loket-current-label">Nomor Dilayani</div>
+          <div class="loket-current-num">${l.current}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // show active ticket if any
+  const active = myBookings.find(b=>b.status==='approved'&&!b.suratSelesai);
+  const ticketSec = document.getElementById('my-ticket-section');
+  if(active) {
+    ticketSec.style.display = 'block';
+    document.getElementById('my-ticket-content').innerHTML = `
+      <div class="ticket-card">
+        <div class="ticket-label">Nomor Antrean Anda</div>
+        <div class="ticket-num">${active.nomorAntrean||'—'}</div>
+        <div class="ticket-detail">
+          📋 Layanan: <strong>${active.layanan}</strong><br>
+          🏢 ${state.lokets[active.loketId-1].nama} — ${state.lokets[active.loketId-1].desc}<br>
+          🗓️ Tanggal: ${formatDate(active.tanggal)}<br>
+          ⏰ Perkiraan tiba: <strong>${active.estimasiTiba||'—'}</strong><br>
+          ✅ Perkiraan selesai: <strong>${active.estimasiSelesai||'—'}</strong>
+        </div>
+      </div>
+    `;
+  } else {
+    ticketSec.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// BOOKING FORM
+// ═══════════════════════════════════════════════════════════
+function renderBookingForm() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('book-tanggal').min = today;
+}
+
+function updateEstimate() {
+  const loketId = document.getElementById('book-loket').value;
+  const layananEl = document.getElementById('book-layanan');
+  const tgl = document.getElementById('book-tanggal').value;
+  const dur = parseInt(layananEl.options[layananEl.selectedIndex]?.dataset?.dur||0);
+  const est = document.getElementById('booking-estimate');
+
+  if(!loketId || !layananEl.value || !tgl) { est.style.display='none'; return; }
+
+  const loket = state.lokets[parseInt(loketId)-1];
+  const waitingPeople = loket.waiting;
+  const avgMinPerPerson = 15;
+  const waitMinutes = waitingPeople * avgMinPerPerson;
+  const openHour = 8, openMin = 0;
+  const totalMins = openHour*60 + openMin + waitMinutes;
+  const arrH = Math.floor(totalMins/60), arrM = totalMins%60;
+  const endMins = totalMins + dur;
+  const endH = Math.floor(endMins/60), endM = endMins%60;
+
+  const pad = n => String(n).padStart(2,'0');
+  est.style.display = 'block';
+  document.getElementById('est-text').textContent = `Tiba sekitar pukul ${pad(arrH)}:${pad(arrM)}`;
+  document.getElementById('est-detail').textContent = `${waitingPeople} orang dalam antrean. Estimasi selesai ±${dur} menit (pukul ${pad(endH)}:${pad(endM)}). Nomor antrean berikutnya akan diberikan setelah disetujui admin.`;
+}
+
+function submitBooking() {
+  const loketId = document.getElementById('book-loket').value;
+  const layananEl = document.getElementById('book-layanan');
+  const tgl = document.getElementById('book-tanggal').value;
+  const keperluan = document.getElementById('book-keperluan').value;
+  const catatan = document.getElementById('book-catatan').value;
+
+  if(!loketId) { showBanner('❌ Pilih loket terlebih dahulu.'); return; }
+  if(!layananEl.value) { showBanner('❌ Pilih jenis layanan.'); return; }
+  if(!tgl) { showBanner('❌ Pilih tanggal kunjungan.'); return; }
+
+  const u = state.currentUser;
+  state.bookingCounter++;
+  const id = `BK-${state.bookingCounter}`;
+
+  state.bookings.push({
+    id, userId: u.ktp, userName: u.nama,
+    loketId: parseInt(loketId),
+    layanan: layananEl.value,
+    tanggal: tgl, keperluan, catatan,
+    status: 'pending',
+    nomorAntrean: null, estimasiTiba: null, estimasiSelesai: null,
+    suratSelesai: false,
+    createdAt: new Date()
+  });
+
+  showBanner('✅ Booking berhasil diajukan! Menunggu konfirmasi admin.');
+  resetBookingForm();
+  navigateTo('status');
+}
+
+function resetBookingForm() {
+  ['book-loket','book-layanan','book-tanggal','book-keperluan','book-catatan'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('booking-estimate').style.display='none';
+}
+
+// ═══════════════════════════════════════════════════════════
+// STATUS BOOKING (WARGA)
+// ═══════════════════════════════════════════════════════════
+function renderStatus() {
+  const u = state.currentUser;
+  const myBookings = state.bookings.filter(b=>b.userId===u.ktp).sort((a,b)=>b.createdAt-a.createdAt);
+  const el = document.getElementById('status-list');
+
+  if(!myBookings.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>Belum ada booking. Buat booking online di menu "Booking Online".</p></div>`;
+    return;
+  }
+
+  el.innerHTML = myBookings.map(b => {
+    const loket = state.lokets[b.loketId-1];
+    let statusBadge, statusInfo = '';
+    if(b.status==='pending') { statusBadge = `<span class="badge badge-warn">⏳ Menunggu Konfirmasi</span>`; statusInfo = 'Pengajuan Anda sedang ditinjau oleh admin kelurahan.'; }
+    else if(b.status==='approved') {
+      statusBadge = `<span class="badge badge-success">✅ Disetujui</span>`;
+      if(b.suratSelesai) {
+        statusBadge = `<span class="badge badge-info">📄 Surat Selesai</span>`;
+        statusInfo = `Surat Anda sudah selesai diproses. Silakan ambil di kantor kelurahan.`;
+      } else {
+        statusInfo = `Nomor antrean: <strong>${b.nomorAntrean}</strong>. Perkiraan tiba pukul <strong>${b.estimasiTiba}</strong>.`;
+      }
+    }
+    else if(b.status==='rejected') { statusBadge = `<span class="badge badge-danger">❌ Ditolak</span>`; statusInfo = 'Booking ditolak. Silakan hubungi kantor kelurahan untuk informasi lebih lanjut.'; }
+
+    return `
+      <div class="card" style="margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text3);margin-bottom:4px;">${b.id}</div>
+            <div style="font-size:16px;font-weight:700;">${b.layanan}</div>
+            <div style="font-size:13px;color:var(--text2);margin-top:2px;">${loket.nama} — ${loket.desc}</div>
+          </div>
+          ${statusBadge}
+        </div>
+        <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;color:var(--text2);">
+          <span>🗓️ Tanggal: <strong>${formatDate(b.tanggal)}</strong></span>
+          <span>📝 Diajukan: ${formatTime(b.createdAt)}</span>
+          ${b.nomorAntrean ? `<span>🎫 No. Antrean: <strong>${b.nomorAntrean}</strong></span>` : ''}
+          ${b.estimasiTiba ? `<span>⏰ Perkiraan Tiba: <strong>${b.estimasiTiba}</strong></span>` : ''}
+          ${b.estimasiSelesai ? `<span>✅ Est. Selesai: <strong>${b.estimasiSelesai}</strong></span>` : ''}
+        </div>
+        ${statusInfo ? `<div style="margin-top:12px;padding:10px 14px;background:var(--bg2);border-radius:var(--radius-sm);font-size:13px;color:var(--text2);">${statusInfo}</div>` : ''}
+        ${b.suratSelesai ? `<div style="margin-top:10px;padding:12px 14px;background:var(--info-light);border-radius:var(--radius-sm);font-size:13px;color:var(--info);font-weight:600;">🎉 Surat dapat diambil mulai pukul ${b.ambilJam||'08:00'} di kantor kelurahan.</div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// MONITOR ANTREAN (WARGA)
+// ═══════════════════════════════════════════════════════════
+function renderAntrean() {
+  document.getElementById('loket-detail').innerHTML = state.lokets.map(l => `
+    <div class="loket-card">
+      <div class="loket-num">${l.id}</div>
+      <div class="loket-label">${l.desc}</div>
+      <div class="loket-stats">
+        <div class="loket-stat"><div class="loket-stat-num">${l.waiting}</div><div class="loket-stat-label">Antrean Waiting</div></div>
+        <div class="loket-stat"><div class="loket-stat-num">${l.done}</div><div class="loket-stat-label">Sudah Selesai</div></div>
+      </div>
+      <div class="loket-current">
+        <div>
+          <div class="loket-current-label">Sedang Dilayani</div>
+          <div class="loket-current-num">${l.current}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('waiting-lists').innerHTML = state.lokets.map(l => `
+    <div style="margin-bottom:24px;">
+      <h3 style="font-family:'Instrument Serif',serif;font-size:18px;margin-bottom:12px;">${l.nama} — Waiting List (${l.waiting} orang)</h3>
+      ${l.queue.length===0 ? '<div class="empty-state"><div class="empty-icon">🎉</div><p>Tidak ada antrian saat ini.</p></div>' :
+        l.queue.map((q,i) => `
+          <div class="queue-item">
+            <div class="queue-num">${q.num}</div>
+            <div class="queue-info">
+              <div class="queue-name">${q.name}</div>
+              <div class="queue-meta">${q.layanan}</div>
+            </div>
+            <div class="queue-time">Perkiraan<br><strong>${q.waktu}</strong></div>
+          </div>
+        `).join('')
+      }
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// NOTIFIKASI (WARGA)
+// ═══════════════════════════════════════════════════════════
+function renderNotif() {
+  const el = document.getElementById('notif-list');
+  if(!state.notifications.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🔔</div><p>Belum ada notifikasi.</p></div>`;
+    return;
+  }
+  el.innerHTML = state.notifications.slice().reverse().map(n => `
+    <div class="notif-item ${n.read?'':'unread'}" onclick="markRead('${n.id}')">
+      ${!n.read?'<div class="notif-dot"></div>':''}
+      <div class="notif-item-title">${n.title}</div>
+      <div class="notif-item-body">${n.body}</div>
+      <div class="notif-item-time">${formatTime(n.time)}</div>
+    </div>
+  `).join('');
+}
+
+function markRead(id) {
+  const n = state.notifications.find(x=>x.id===id);
+  if(n) { n.read=true; renderNotif(); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// ADMIN: PERSETUJUAN BOOKING
+// ═══════════════════════════════════════════════════════════
+function renderAdminBooking() {
+  const tbody = document.getElementById('admin-booking-tbody');
+  const bookings = state.bookings.sort((a,b)=>b.createdAt-a.createdAt);
+  if(!bookings.length) { tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px;">Belum ada booking masuk.</td></tr>`; return; }
+
+  tbody.innerHTML = bookings.map(b => {
+    const loket = state.lokets[b.loketId-1];
+    let badge, actions = '';
+    if(b.status==='pending') {
+      badge = `<span class="badge badge-warn">⏳ Pending</span>`;
+      actions = `<div class="action-btns"><button class="btn-sm btn-approve" onclick="approveBooking('${b.id}')">✅ Setujui</button><button class="btn-sm btn-reject" onclick="rejectBooking('${b.id}')">❌ Tolak</button></div>`;
+    } else if(b.status==='approved') {
+      badge = `<span class="badge badge-success">✅ Disetujui</span>`;
+      actions = `<span style="font-size:12px;color:var(--text3);">${b.nomorAntrean}</span>`;
+    } else {
+      badge = `<span class="badge badge-danger">❌ Ditolak</span>`;
+    }
+    return `
+      <tr>
+        <td><strong>${b.id}</strong></td>
+        <td>${b.userName}</td>
+        <td>${loket.nama}</td>
+        <td>${b.layanan}</td>
+        <td>${formatDate(b.tanggal)}</td>
+        <td>${badge}</td>
+        <td>${actions}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function approveBooking(id) {
+  const b = state.bookings.find(x=>x.id===id);
+  if(!b) return;
+  const loket = state.lokets[b.loketId-1];
+
+  // assign queue number
+  const prefix = ['A','B','C'][b.loketId-1];
+  state.queueCounters[b.loketId]++;
+  const num = state.queueCounters[b.loketId];
+  const queueNum = `${prefix}-${String(num+loket.done).padStart(3,'0')}`;
+
+  // estimate time
+  const waitingPeople = loket.waiting;
+  const avgMin = 15;
+  const totalMins = 8*60 + waitingPeople*avgMin;
+  const pad = n => String(n).padStart(2,'0');
+  const arrH = Math.floor(totalMins/60), arrM = totalMins%60;
+  const layananEl = { 'Surat Keterangan Domisili':15,'Surat Keterangan Tidak Mampu':20,'Surat Pengantar KTP':10,'Surat Keterangan Usaha':25,'Kartu Keluarga':30,'Surat Pindah':25,'Legalisasi Dokumen':10,'Surat Keterangan Kelahiran':20 };
+  const dur = layananEl[b.layanan] || 15;
+  const endMins = totalMins + dur;
+  const endH = Math.floor(endMins/60), endM = endMins%60;
+
+  b.status = 'approved';
+  b.nomorAntrean = queueNum;
+  b.estimasiTiba = `${pad(arrH)}:${pad(arrM)}`;
+  b.estimasiSelesai = `${pad(endH)}:${pad(endM)}`;
+
+  loket.waiting++;
+  loket.queue.push({ num: queueNum, name: b.userName, layanan: b.layanan, waktu: b.estimasiTiba });
+
+  // notify user
+  const nId = 'n'+Date.now();
+  state.notifications.push({
+    id: nId,
+    title: 'Booking Disetujui ✅',
+    body: `Booking ${b.id} untuk "${b.layanan}" telah disetujui. Nomor antrean Anda: ${queueNum}. Perkiraan tiba pukul ${b.estimasiTiba}. Perkiraan selesai pukul ${b.estimasiSelesai}.`,
+    time: new Date(), read: false
+  });
+
+  showBanner(`✅ Booking ${id} disetujui. Nomor antrean: ${queueNum}`);
+  renderAdminBooking();
+}
+
+function rejectBooking(id) {
+  openModal('Tolak Booking', `Apakah Anda yakin ingin menolak booking <strong>${id}</strong>?`, () => {
+    const b = state.bookings.find(x=>x.id===id);
+    if(b) {
+      b.status = 'rejected';
+      const nId = 'n'+Date.now();
+      state.notifications.push({
+        id: nId,
+        title: 'Booking Ditolak',
+        body: `Mohon maaf, booking ${b.id} untuk "${b.layanan}" tidak dapat disetujui. Silakan hubungi kantor kelurahan untuk informasi lebih lanjut.`,
+        time: new Date(), read: false
+      });
+      showBanner(`Booking ${id} telah ditolak.`);
+      renderAdminBooking();
+    }
+    closeModal();
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// ADMIN: KELOLA ANTREAN
+// ═══════════════════════════════════════════════════════════
+function renderAdminAntrean() {
+  document.getElementById('admin-loket-grid').innerHTML = state.lokets.map(l => `
+    <div class="loket-card">
+      <div class="loket-num">${l.id}</div>
+      <div class="loket-label">${l.desc}</div>
+      <div class="loket-current" style="margin-bottom:14px;">
+        <div>
+          <div class="loket-current-label">Sedang Dilayani</div>
+          <div class="loket-current-num">${l.current}</div>
+        </div>
+      </div>
+      <div class="loket-stats" style="margin-bottom:14px;">
+        <div class="loket-stat"><div class="loket-stat-num">${l.waiting}</div><div class="loket-stat-label">Antrian</div></div>
+        <div class="loket-stat"><div class="loket-stat-num">${l.done}</div><div class="loket-stat-label">Selesai</div></div>
+      </div>
+      <button class="btn-accent" style="width:100%;font-size:13px;" onclick="callNext(${l.id})">📢 Panggil Berikutnya</button>
+      <div style="margin-top:8px;">
+        ${l.queue.length>0 ? `<div style="margin-top:10px;font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Waiting List</div>` + l.queue.slice(0,3).map(q=>`<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--bg2);border-radius:6px;font-size:12px;margin-bottom:4px;"><span style="font-weight:600;">${q.num}</span><span>${q.name}</span><span style="color:var(--text3)">${q.waktu}</span></div>`).join('') : '<div style="font-size:12px;color:var(--text3);text-align:center;margin-top:8px;">Antrean kosong</div>'}
+        ${l.queue.length>3?`<div style="font-size:11px;color:var(--text3);text-align:center;margin-top:4px;">+ ${l.queue.length-3} lainnya</div>`:''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function callNext(loketId) {
+  const loket = state.lokets[loketId-1];
+  if(loket.queue.length===0) { showBanner('ℹ️ Tidak ada antrean tersisa.'); return; }
+  const next = loket.queue.shift();
+  loket.current = next.num;
+  loket.waiting = Math.max(0, loket.waiting-1);
+  loket.done++;
+  showBanner(`📢 Memanggil: ${next.num} — ${next.name}`);
+  renderAdminAntrean();
+}
+
+// ═══════════════════════════════════════════════════════════
+// ADMIN: SURAT SELESAI
+// ═══════════════════════════════════════════════════════════
+function renderAdminSelesai() {
+  const tbody = document.getElementById('admin-selesai-tbody');
+  const approved = state.bookings.filter(b=>b.status==='approved');
+  if(!approved.length) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:32px;">Belum ada booking yang disetujui.</td></tr>`; return; }
+
+  tbody.innerHTML = approved.map(b => {
+    const done = b.suratSelesai;
+    const badge = done ? `<span class="badge badge-info">📄 Selesai</span>` : `<span class="badge badge-warn">⚙️ Diproses</span>`;
+    const action = done ? `<span style="font-size:12px;color:var(--text3);">Dapat diambil ${b.ambilJam}</span>` : `<button class="btn-sm btn-done" onclick="markSuratSelesai('${b.id}')">📄 Tandai Selesai</button>`;
+    return `
+      <tr>
+        <td><strong>${b.id}</strong></td>
+        <td>${b.userName}</td>
+        <td>${b.layanan}</td>
+        <td>${formatDate(b.tanggal)}</td>
+        <td>${badge}</td>
+        <td>${action}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function markSuratSelesai(id) {
+  const b = state.bookings.find(x=>x.id===id);
+  if(!b) return;
+  // pick up time: current time +30min
+  const now = new Date(); now.setMinutes(now.getMinutes()+30);
+  const pad = n => String(n).padStart(2,'0');
+  b.suratSelesai = true;
+  b.ambilJam = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+  const nId = 'n'+Date.now();
+  state.notifications.push({
+    id: nId,
+    title: '🎉 Surat Anda Sudah Selesai!',
+    body: `Surat "${b.layanan}" (${b.id}) telah selesai diproses. Silakan ambil di kantor kelurahan mulai pukul ${b.ambilJam}. Harap bawa bukti booking ini.`,
+    time: new Date(), read: false
+  });
+
+  showBanner(`📄 Surat ${b.id} ditandai selesai. Notifikasi dikirim ke warga.`);
+  renderAdminSelesai();
+}
+
+// ═══════════════════════════════════════════════════════════
+// ADMIN: MONITOR
+// ═══════════════════════════════════════════════════════════
+function renderAdminMonitor() {
+  const totalWaiting = state.lokets.reduce((s,l)=>s+l.waiting,0);
+  const totalDone = state.lokets.reduce((s,l)=>s+l.done,0);
+  const pendingBookings = state.bookings.filter(b=>b.status==='pending').length;
+  const approvedBookings = state.bookings.filter(b=>b.status==='approved').length;
+
+  document.getElementById('admin-stats-grid').innerHTML = `
+    <div class="stat-card"><div class="stat-val">${totalWaiting}</div><div class="stat-label">Total Antrian</div><div class="stat-sub">Semua loket</div></div>
+    <div class="stat-card"><div class="stat-val">${totalDone}</div><div class="stat-label">Selesai Hari Ini</div><div class="stat-sub">Semua loket</div></div>
+    <div class="stat-card"><div class="stat-val">${pendingBookings}</div><div class="stat-label">Booking Pending</div><div class="stat-sub">Menunggu persetujuan</div></div>
+    <div class="stat-card"><div class="stat-val">${approvedBookings}</div><div class="stat-label">Booking Aktif</div><div class="stat-sub">Sudah disetujui</div></div>
+    <div class="stat-card"><div class="stat-val">${state.bookings.length}</div><div class="stat-label">Total Booking</div><div class="stat-sub">Hari ini</div></div>
+  `;
+
+  document.getElementById('admin-all-queues').innerHTML = state.lokets.map(l => `
+    <div style="margin-bottom:24px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <h3 style="font-family:'Instrument Serif',serif;font-size:18px;">${l.nama} — ${l.desc}</h3>
+        <span class="badge badge-success">Dilayani: ${l.current}</span>
+      </div>
+      <div class="loket-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;">
+        <div class="loket-stat"><div class="loket-stat-num">${l.waiting}</div><div class="loket-stat-label">Antrian</div></div>
+        <div class="loket-stat"><div class="loket-stat-num">${l.done}</div><div class="loket-stat-label">Selesai</div></div>
+        <div class="loket-stat"><div class="loket-stat-num">${l.waiting+l.done}</div><div class="loket-stat-label">Total</div></div>
+      </div>
+      ${l.queue.length>0 ? l.queue.map(q=>`
+        <div class="queue-item">
+          <div class="queue-num">${q.num}</div>
+          <div class="queue-info"><div class="queue-name">${q.name}</div><div class="queue-meta">${q.layanan}</div></div>
+          <div class="queue-time">Perkiraan<br><strong>${q.waktu}</strong></div>
+        </div>
+      `).join('') : '<div class="empty-state" style="padding:20px;"><p>Antrean kosong.</p></div>'}
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+function formatDate(str) {
+  if(!str) return '—';
+  const d = new Date(str);
+  return d.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+}
+function formatTime(d) {
+  if(!d) return '—';
+  const dt = d instanceof Date ? d : new Date(d);
+  return dt.toLocaleString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+
+function showBanner(msg) {
+  const b = document.getElementById('notif-banner');
+  document.getElementById('notif-banner-text').textContent = msg;
+  b.classList.add('show');
+  setTimeout(()=>b.classList.remove('show'), 3500);
+}
+
+let modalCallback = null;
+function openModal(title, body, cb) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = body;
+  modalCallback = cb;
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('modal-confirm').onclick = () => { if(modalCallback) modalCallback(); };
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+</script>
+</body>
+</html>
